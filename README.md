@@ -53,7 +53,7 @@ shopping_cart_analysis/
 git clone <your_repo_url>
 cd shopping_cart_analysis
 pip install -r requirements.txt
-🧪 Data Preparation
+Data Preparation
 Đặt file gốc vào:
 ```
 
