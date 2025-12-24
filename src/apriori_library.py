@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import stats
-from mlxtend.frequent_patterns import apriori, association_rules
+from mlxtend.frequent_patterns import apriori, association_rules, fpgrowth
 from sklearn.preprocessing import StandardScaler
 import plotly.express as px
 import networkx as nx
@@ -434,6 +434,43 @@ class AssociationRulesMiner:
         rules_df.to_csv(output_path, index=False)
         print(f"Đã lưu luật vào: {output_path}")
 
+class FPGrowthMiner:
+    """
+    Lab 2: FP-Growth Miner
+    - run(min_support): trả về DataFrame frequent_itemsets kèm support
+    - generate_rules(...): sinh association rules từ frequent_itemsets
+    """
+
+    def __init__(self, basket_bool: pd.DataFrame):
+        self.basket_bool = basket_bool
+
+    def run(self, min_support: float = 0.01, use_colnames: bool = True, max_len=None) -> pd.DataFrame:
+        frequent_itemsets = fpgrowth(
+            self.basket_bool,
+            min_support=min_support,
+            use_colnames=use_colnames,
+            max_len=max_len
+        )
+        frequent_itemsets = frequent_itemsets.sort_values("support", ascending=False).reset_index(drop=True)
+        return frequent_itemsets
+
+    def association_rules(
+        self,
+        frequent_itemsets: pd.DataFrame,
+        metric: str = "confidence",
+        min_threshold: float = 0.2
+    ) -> pd.DataFrame:
+        """
+        Giữ tên method gần với hướng dẫn Lab: gọi association_rules để sinh luật.
+        Output: DataFrame rules có các cột quen thuộc: antecedents, consequents, support, confidence, lift...
+        """
+        rules = association_rules(
+            frequent_itemsets,
+            metric=metric,
+            min_threshold=min_threshold
+        )
+        rules = rules.sort_values(["lift", "confidence", "support"], ascending=False).reset_index(drop=True)
+        return rules
 
 # =========================================================
 # 4. DATA VISUALIZER (EDA + RFM + APRIORI)
